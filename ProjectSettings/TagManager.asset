@@ -7,6 +7,7 @@ TagManager:
   - Paddle
   - BarrierLeft
   - BarrierRight
+  - Breakable
   layers:
   - Default
   - TransparentFX

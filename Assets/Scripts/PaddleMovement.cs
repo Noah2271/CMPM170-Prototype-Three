@@ -11,7 +11,6 @@ public class PaddleMovement : MonoBehaviour
     private bool freezeLeft = false;
     private InputAction Movement;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         Paddle = GameObject.Find("Paddle");
@@ -20,23 +19,23 @@ public class PaddleMovement : MonoBehaviour
         Movement = InputSystem.actions.FindActionMap("Player").FindAction("Move");
 
     }
+
+    // 1. OnTriggerEnter stops velocity and freezes directional movement controls if touch border wall
+    // 2. OnTriggerExit unfreezes the controls
+    // 3. FixedUpdate just moves the paddle and takes away velocity if controls released
     public void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log("Wall hit");
         Paddle.GetComponent<Rigidbody2D>().linearVelocity = new Vector2(0, 0);
-
         if (other.gameObject.CompareTag("BarrierRight")) freezeRight = true;
         if (other.gameObject.CompareTag("BarrierLeft")) freezeLeft = true;
     }
 
     public void OnTriggerExit2D(Collider2D other)
     {
-        Debug.Log("Wall hit");
         if (other.gameObject.CompareTag("BarrierRight")) freezeRight = false;
         if (other.gameObject.CompareTag("BarrierLeft")) freezeLeft = false;
     }
 
-    // Update is called once per frame
     void FixedUpdate() {
         if (Movement.ReadValue<Vector2>().x != 0)
         {
