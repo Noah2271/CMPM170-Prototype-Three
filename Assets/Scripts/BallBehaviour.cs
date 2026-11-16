@@ -5,6 +5,8 @@ public class BallBehaviour : MonoBehaviour
     private GameObject Paddle;
     private Rigidbody2D BallRigidBody;
 
+    public float horizontalSpeed = 2f;
+
     void Start()
     {
         Paddle = GameObject.Find("Paddle");
@@ -30,7 +32,7 @@ public class BallBehaviour : MonoBehaviour
     // 3. BounceOffPaddle takes the difference from the middle X position of the paddle and uses it to allow the player to aim when reflecting the ball
     void ApplyDownwardForce(float amount)
     {
-        BallRigidBody.linearVelocity = new Vector2(2f, amount);
+        BallRigidBody.linearVelocity = new Vector2(horizontalSpeed, amount);
     }
 
     void BounceOffWall()
