@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3642912669373737347}
   - component: {fileID: 886741107927429875}
   - component: {fileID: 3081445243447762037}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Ball
   m_TagString: Ball
   m_Icon: {fileID: 0}
@@ -170,3 +170,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a1a5c075b85bac49b719781b097af37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BallBehaviour
+  horizontalSpeed: 2

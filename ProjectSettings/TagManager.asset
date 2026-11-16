@@ -8,11 +8,14 @@ TagManager:
   - BarrierLeft
   - BarrierRight
   - Breakable
+  - Ball
+  - OuterBoundary
+  - GameOverObject
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Ball Layer
   - Water
   - UI
   - 

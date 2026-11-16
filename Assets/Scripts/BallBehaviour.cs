@@ -1,7 +1,9 @@
+using TMPro;
 using UnityEngine;
 
 public class BallBehaviour : MonoBehaviour
 {
+    private UI_Manager UI;
     private GameObject Paddle;
     private Rigidbody2D BallRigidBody;
 
@@ -9,9 +11,10 @@ public class BallBehaviour : MonoBehaviour
 
     void Start()
     {
-        Paddle = GameObject.Find("Paddle");
+        UI = GameObject.Find("UI_Manager").GetComponent<UI_Manager>();
+        Paddle = GameObject.Find("Paddle");;
         BallRigidBody = this.gameObject.GetComponent<Rigidbody2D>();
-        ApplyDownwardForce(-2.5f);
+        ApplyDownwardForce(-5f);
     }
 
     public void OnTriggerEnter2D(Collider2D other)
@@ -24,8 +27,16 @@ public class BallBehaviour : MonoBehaviour
     {
         Debug.Log("Donk");
         if (collision.gameObject.CompareTag("Breakable")) collision.gameObject.SetActive(false);
-    }
+        if (collision.gameObject.CompareTag("OuterBoundary")) Destroy(this.gameObject);
+        if (collision.gameObject.CompareTag("GameOverObject"))
+        {
+            UI.EndScreenText.gameObject.SetActive(true);
+            collision.gameObject.SetActive(false);
+            Time.timeScale = 0;
 
+        }
+    }
+    
     // Force Functions
     // 1. ApplyDownwardForce used for testing just to throw ball down the field, might be useful when spawning the prefab via enemies
     // 2. BounceOffWall has specific trigger volume checks and a wall bounce mechanics since if the velocity is too shallow it just hugs the wall with regular Unity physics
