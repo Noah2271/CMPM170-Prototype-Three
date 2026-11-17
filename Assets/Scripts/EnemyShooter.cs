@@ -8,13 +8,15 @@ public class EnemyShooter : MonoBehaviour
     public float shootInterval = 3f;
     public float respawnTime = 5f;
 
+    private Audio_Manager Audio;
     private SpriteRenderer enemySprite;
     private Collider2D enemyCollider;
     private bool isDead = false;
 
     void Start()
     {
-        // Get the enemy's sprite and collider
+        // Get the enemy's sprite and collider, along with audio manager
+        Audio = GameObject.Find("Audio_Manager").GetComponent<Audio_Manager>();
         enemySprite = GetComponent<SpriteRenderer>();
         enemyCollider = GetComponent<Collider2D>();
 
@@ -35,6 +37,8 @@ public class EnemyShooter : MonoBehaviour
                 // Spawn a ball below the enemy
                 Vector3 spawnPosition = transform.position + Vector3.down;
 
+                Audio.PlayFire();
+                Debug.Log("Ball");
                 GameObject newBall = Instantiate(ballPrefab, spawnPosition, Quaternion.identity);
 
                 // Give the ball a random horizontal speed
@@ -53,6 +57,7 @@ public class EnemyShooter : MonoBehaviour
         if (collision.gameObject.CompareTag("Ball") && !isDead)
         {
             // Start the respawn coroutine
+            Audio.PlayEnemyExplode();
             StartCoroutine(Respawn());
         }
     }

@@ -4,6 +4,7 @@ using UnityEngine;
 public class BallBehaviour : MonoBehaviour
 {
     private UI_Manager UI;
+    private Audio_Manager Audio;
     private GameObject Paddle;
     private Rigidbody2D BallRigidBody;
 
@@ -12,6 +13,7 @@ public class BallBehaviour : MonoBehaviour
     void Start()
     {
         UI = GameObject.Find("UI_Manager").GetComponent<UI_Manager>();
+        Audio = GameObject.Find("Audio_Manager").GetComponent<Audio_Manager>();
         Paddle = GameObject.Find("Paddle");;
         BallRigidBody = this.gameObject.GetComponent<Rigidbody2D>();
         ApplyDownwardForce(-5f);
@@ -26,10 +28,15 @@ public class BallBehaviour : MonoBehaviour
     public void OnCollisionEnter2D(Collision2D collision)
     {
         Debug.Log("Donk");
-        if (collision.gameObject.CompareTag("Breakable")) collision.gameObject.SetActive(false);
+        if (collision.gameObject.CompareTag("Breakable"))
+        {
+            Audio.PlayDigitalBreak();
+            collision.gameObject.SetActive(false);
+        }
         if (collision.gameObject.CompareTag("OuterBoundary")) Destroy(this.gameObject);
         if (collision.gameObject.CompareTag("GameOverObject"))
         {
+            Audio.PlayDie();
             UI.EndScreenText.gameObject.SetActive(true);
             collision.gameObject.SetActive(false);
             Time.timeScale = 0;
@@ -54,6 +61,7 @@ public class BallBehaviour : MonoBehaviour
     void BounceOffPaddle()
     {
         Debug.Log("Bounce");
+        Audio.PlayReflect();
         float differenceFromCenter = transform.position.x - Paddle.transform.position.x;
         BallRigidBody.linearVelocity = new Vector2(differenceFromCenter * 5f, -BallRigidBody.linearVelocityY);
     }
