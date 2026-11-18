@@ -61,7 +61,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: 1afc58b2d59ba0a4884ddc4f76064e0a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -170,4 +170,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a1a5c075b85bac49b719781b097af37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BallBehaviour
+  DeflectedMaterial: {fileID: 2100000, guid: 32047b565e093df48b689f391d35eb4e, type: 2}
+  EnemyProjectileMaterial: {fileID: 2100000, guid: 1afc58b2d59ba0a4884ddc4f76064e0a, type: 2}
   horizontalSpeed: 2

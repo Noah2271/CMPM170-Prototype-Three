@@ -40,7 +40,7 @@ public class EnemyShooter : MonoBehaviour
             if (!isDead)
             {
                 // Spawn a ball below the enemy
-                Vector3 spawnPosition = transform.position + Vector3.down;
+                Vector3 spawnPosition = transform.position + Vector3.down/2;
 
                 Audio.PlayFire();
                 Debug.Log("Ball");

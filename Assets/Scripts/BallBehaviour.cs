@@ -7,11 +7,9 @@ public class BallBehaviour : MonoBehaviour
     private Audio_Manager Audio;
     private GameObject Paddle;
     private Rigidbody2D BallRigidBody;
-
-    public float horizontalSpeed = 2f;
-
-    // Checks if the ball was launched by an enemy
-    private bool launchedAtAngle = false;
+    public Material DeflectedMaterial;
+    public Material EnemyProjectileMaterial;
+    public float PreservedVerticalVelocity;
 
     void Start()
     {
@@ -19,17 +17,23 @@ public class BallBehaviour : MonoBehaviour
         Audio = GameObject.Find("Audio_Manager").GetComponent<Audio_Manager>();
         Paddle = GameObject.Find("Paddle");;
         BallRigidBody = this.gameObject.GetComponent<Rigidbody2D>();
-        
-        // Only apply default movement if the ball wasn't launched by an enemy
-        if (!launchedAtAngle)
-        {
-            ApplyDownwardForce(-5f);
-        }
     }
 
+    // Trigger and Collision Checks
+    // 1. Paddle Trigger : Play reflect sound, update preserved vertical velocity, enable the ball to kill the enemy, and switch the material. Finally call paddle bounce physics update function
+    // 2. Barrier Right/Left Trigger : Call bounce wall bounce physics update function
+    // 3. Breakable Collision : Play digital break sound, disable the breakable, and update preserved vertical velocity (Unity physics engine is handling bounces off barriers since they're more complex and I couldn't figure out the code)
+    // 4. Outer Boundary Collision : Big brick on the top outside the screen, just deletes balls that aren't in use.
+    // 5. GameOverObject Collision : The earth, plays d eath sound and updates screen to reflect end of game. Stops the game via timescale.
     public void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("Paddle")) BounceOffPaddle();
+        if (other.gameObject.CompareTag("Paddle")) {
+            Audio.PlayReflect();
+            PreservedVerticalVelocity = -PreservedVerticalVelocity;
+            this.gameObject.layer = LayerMask.NameToLayer("Kill Ball Layer");
+            this.gameObject.GetComponent<SpriteRenderer>().material = DeflectedMaterial;
+            BounceOffPaddle();
+        }
         if (other.gameObject.CompareTag("BarrierRight") || other.gameObject.CompareTag("BarrierLeft")) BounceOffWall();
     }
 
@@ -40,6 +44,9 @@ public class BallBehaviour : MonoBehaviour
         {
             Audio.PlayDigitalBreak();
             collision.gameObject.SetActive(false);
+            // Attempt to mitigate issue where rebound collision on barriers while moving upwards basically turns ball into a drill
+            if(PreservedVerticalVelocity < 0) PreservedVerticalVelocity = -PreservedVerticalVelocity;
+
         }
         if (collision.gameObject.CompareTag("OuterBoundary")) Destroy(this.gameObject);
         if (collision.gameObject.CompareTag("GameOverObject"))
@@ -53,24 +60,15 @@ public class BallBehaviour : MonoBehaviour
     }
     
     // Force Functions
-    // 1. ApplyDownwardForce used for testing just to throw ball down the field, might be useful when spawning the prefab via enemies
-    // 2. BounceOffWall has specific trigger volume checks and a wall bounce mechanics since if the velocity is too shallow it just hugs the wall with regular Unity physics
-    // 3. BounceOffPaddle takes the difference from the middle X position of the paddle and uses it to allow the player to aim when reflecting the ball
-    void ApplyDownwardForce(float amount)
-    {
-        BallRigidBody.linearVelocity = new Vector2(horizontalSpeed, amount);
-    }
-
+    // 1. ShooAtAngle takes a angle and velocity argument and rotates the ball by the angle given, then fires at the given velocity
+    // 2. ApplyDownwardForce used for testing just to throw ball down the field, might be useful when spawning the prefab via enemies
+    // 3. BounceOffWall has specific trigger volume checks and a wall bounce mechanics since if the velocity is too shallow it just hugs the wall with regular Unity physics
+    // 4. BounceOffPaddle takes the difference from the middle X position of the paddle and uses it to allow the player to aim when reflecting the ball
     public void ShootAtAngle(float angle, float velocity)
     {
-        // Mark the ball as launched by the enemy
-        launchedAtAngle = true;
-
-        // Rotate the direction based on the given angle
         Vector2 direction = (Vector2)(Quaternion.Euler(0, 0, angle) * Vector3.right);
-
-        // Move the ball in that direction at the given speed
         GetComponent<Rigidbody2D>().linearVelocity = direction * velocity;
+        PreservedVerticalVelocity = GetComponent<Rigidbody2D>().linearVelocityY;
     }
 
     void BounceOffWall()
@@ -80,9 +78,14 @@ public class BallBehaviour : MonoBehaviour
 
     void BounceOffPaddle()
     {
-        Debug.Log("Bounce");
-        Audio.PlayReflect();
         float differenceFromCenter = transform.position.x - Paddle.transform.position.x;
         BallRigidBody.linearVelocity = new Vector2(differenceFromCenter * 5f, -BallRigidBody.linearVelocityY);
+    }
+
+    // Update
+    // 1. Constantly set ball velocity to preserved value since physics material tends to lose momentum per collision.
+    void FixedUpdate()
+    {
+        BallRigidBody.linearVelocityY = PreservedVerticalVelocity;
     }
 }
