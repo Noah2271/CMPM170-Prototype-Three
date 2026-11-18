@@ -8,6 +8,11 @@ public class EnemyShooter : MonoBehaviour
     public float shootInterval = 3f;
     public float respawnTime = 5f;
 
+    // Controls the spread and speed of enemy bullets
+    public float minShootAngle = 240f;
+    public float maxShootAngle = 300f;
+    public float bulletSpeed = 5f;
+
     private Audio_Manager Audio;
     private SpriteRenderer enemySprite;
     private Collider2D enemyCollider;
@@ -39,13 +44,14 @@ public class EnemyShooter : MonoBehaviour
 
                 Audio.PlayFire();
                 Debug.Log("Ball");
+
                 GameObject newBall = Instantiate(ballPrefab, spawnPosition, Quaternion.identity);
 
-                // Give the ball a random horizontal speed
-                float randomX = Random.Range(-2f, 2f);
+                // Generate a random angle within the downward cone
+                float randomAngle = Random.Range(minShootAngle, maxShootAngle);
 
-                // Set the random direction for the spawned ball
-                newBall.GetComponent<BallBehaviour>().horizontalSpeed = randomX;
+                // Shoot the ball using the random angle and speed
+                newBall.GetComponent<BallBehaviour>().ShootAtAngle(randomAngle, bulletSpeed);
             }
         }
     }

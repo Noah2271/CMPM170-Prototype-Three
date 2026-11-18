@@ -10,13 +10,21 @@ public class BallBehaviour : MonoBehaviour
 
     public float horizontalSpeed = 2f;
 
+    // Checks if the ball was launched by an enemy
+    private bool launchedAtAngle = false;
+
     void Start()
     {
         UI = GameObject.Find("UI_Manager").GetComponent<UI_Manager>();
         Audio = GameObject.Find("Audio_Manager").GetComponent<Audio_Manager>();
         Paddle = GameObject.Find("Paddle");;
         BallRigidBody = this.gameObject.GetComponent<Rigidbody2D>();
-        ApplyDownwardForce(-5f);
+        
+        // Only apply default movement if the ball wasn't launched by an enemy
+        if (!launchedAtAngle)
+        {
+            ApplyDownwardForce(-5f);
+        }
     }
 
     public void OnTriggerEnter2D(Collider2D other)
@@ -51,6 +59,18 @@ public class BallBehaviour : MonoBehaviour
     void ApplyDownwardForce(float amount)
     {
         BallRigidBody.linearVelocity = new Vector2(horizontalSpeed, amount);
+    }
+
+    public void ShootAtAngle(float angle, float velocity)
+    {
+        // Mark the ball as launched by the enemy
+        launchedAtAngle = true;
+
+        // Rotate the direction based on the given angle
+        Vector2 direction = (Vector2)(Quaternion.Euler(0, 0, angle) * Vector3.right);
+
+        // Move the ball in that direction at the given speed
+        GetComponent<Rigidbody2D>().linearVelocity = direction * velocity;
     }
 
     void BounceOffWall()
