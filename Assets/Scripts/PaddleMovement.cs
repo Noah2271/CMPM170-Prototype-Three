@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.InputSystem;
+using System.IO;
 
 public class PaddleMovement : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class PaddleMovement : MonoBehaviour
     private bool freezeRight = false;
     private bool freezeLeft = false;
     private InputAction Movement;
+    private float paddleWidth;
 
     void Start()
     {
@@ -17,7 +19,7 @@ public class PaddleMovement : MonoBehaviour
         BorderRight = GameObject.Find("BorderRight");
         BorderLeft = GameObject.Find("BorderLeft");
         Movement = InputSystem.actions.FindActionMap("Player").FindAction("Move");
-
+        Cursor.visible = false;
     }
 
     // 1. OnTriggerEnter stops velocity and freezes directional movement controls if touch border wall
@@ -28,6 +30,7 @@ public class PaddleMovement : MonoBehaviour
         Paddle.GetComponent<Rigidbody2D>().linearVelocity = new Vector2(0, 0);
         if (other.gameObject.CompareTag("BarrierRight")) freezeRight = true;
         if (other.gameObject.CompareTag("BarrierLeft")) freezeLeft = true;
+        paddleWidth = Paddle.GetComponent<Renderer>().bounds.size.x;
     }
 
     public void OnTriggerExit2D(Collider2D other)
@@ -37,21 +40,33 @@ public class PaddleMovement : MonoBehaviour
     }
 
     void FixedUpdate() {
+        //arrow keys
         if (Movement.ReadValue<Vector2>().x != 0)
         {
-
             if (Movement.ReadValue<Vector2>().x > 0 && !freezeRight)
             {
-                Paddle.GetComponent<Rigidbody2D>().linearVelocity = new Vector2(2.5f, 0);
+                Paddle.GetComponent<Rigidbody2D>().linearVelocity = new Vector2(6f, 0);
             }
             if (Movement.ReadValue<Vector2>().x < 0 && !freezeLeft)
             {
-                Paddle.GetComponent<Rigidbody2D>().linearVelocity = new Vector2(-2.5f, 0);
+                Paddle.GetComponent<Rigidbody2D>().linearVelocity = new Vector2(-6f, 0);
             }
+        }
+        // mouse movement
+        else if (Mouse.current != null)
+        {
+            Vector2 movement = Mouse.current.delta.ReadValue();
+            if ((movement.x < 0 && freezeLeft) || (movement.x > 0 && freezeRight))
+            {
+                movement = Vector2.zero;
+                Paddle.transform.position = new Vector2(Mathf.Clamp(Paddle.transform.position.x, -3.2f + paddleWidth / 2, 3.06f - paddleWidth / 2), Paddle.transform.position.y);
+            }
+            Paddle.GetComponent<Rigidbody2D>().linearVelocity = new Vector2(movement.x, 0);
         }
         else
         {
             Paddle.GetComponent<Rigidbody2D>().linearVelocity = new Vector2(0, 0);
+
         }
 
 
