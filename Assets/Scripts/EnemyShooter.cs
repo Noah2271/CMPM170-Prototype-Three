@@ -63,6 +63,7 @@ public class EnemyShooter : MonoBehaviour
         if (collision.gameObject.CompareTag("Ball") && !isDead)
         {
             // Start the respawn coroutine
+            collision.gameObject.GetComponent<BallBehaviour>().PreservedVerticalVelocity = -collision.gameObject.GetComponent<BallBehaviour>().PreservedVerticalVelocity;
             Audio.PlayEnemyExplode();
             StartCoroutine(Respawn());
         }
