@@ -65,22 +65,21 @@ public class EnemyShooter : MonoBehaviour
             // Start the respawn coroutine
             collision.gameObject.GetComponent<BallBehaviour>().PreservedVerticalVelocity = -collision.gameObject.GetComponent<BallBehaviour>().PreservedVerticalVelocity;
             Audio.PlayEnemyExplode();
-            StartCoroutine(Respawn());
+
+            // Mark the enemy as dead
+            isDead = true;
+
+            // Hide the enemy and disable its collider
+            enemySprite.enabled = false;
+            enemyCollider.enabled = false;
+
+            // lets the parent know a part has been broken
+            this.GetComponentInParent<EnemyRespawn>().BreakPart();
         }
     }
 
-    IEnumerator Respawn()
+    public void Respawn()
     {
-        // Mark the enemy as dead
-        isDead = true;
-
-        // Hide the enemy and disable its collider
-        enemySprite.enabled = false;
-        enemyCollider.enabled = false;
-
-        // Wait 5 seconds before respawning
-        yield return new WaitForSeconds(respawnTime);
-
         // Make the enemy visible again
         enemySprite.enabled = true;
         enemyCollider.enabled = true;
