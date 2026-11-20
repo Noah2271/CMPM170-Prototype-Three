@@ -2,15 +2,21 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.InputSystem;
 using System.IO;
+using JetBrains.Annotations;
 
 public class PaddleMovement : MonoBehaviour
 {
     private GameObject Paddle;
     private GameObject BorderLeft;
     private GameObject BorderRight;
+    public Material DefaultMaterial;
+    public Material DeflectMaterial;
+    public bool DeflectOn = false;
+    public bool DeflectAvailable = false;
     private bool freezeRight = false;
     private bool freezeLeft = false;
     private InputAction Movement;
+    private InputAction ToggleDeflect;
     private float paddleWidth;
 
     void Start()
@@ -19,6 +25,8 @@ public class PaddleMovement : MonoBehaviour
         BorderRight = GameObject.Find("BorderRight");
         BorderLeft = GameObject.Find("BorderLeft");
         Movement = InputSystem.actions.FindActionMap("Player").FindAction("Move");
+        ToggleDeflect = InputSystem.actions.FindActionMap("Player").FindAction("ToggleDeflect");
+        StartCoroutine(DeflectCooldown());
         Cursor.visible = false;
     }
 
@@ -68,7 +76,33 @@ public class PaddleMovement : MonoBehaviour
             Paddle.GetComponent<Rigidbody2D>().linearVelocity = new Vector2(0, 0);
 
         }
+    }
 
+    IEnumerator DeflectCooldown()
+    {
+        yield return new WaitForSeconds(10f);
+        DeflectAvailable = true;
+    }
+    IEnumerator DeflectDuration()
+    {
+        yield return new WaitForSeconds(5f);
+        this.gameObject.GetComponent<SpriteRenderer>().material = DefaultMaterial;
+        DeflectOn = false;
+    }
 
-}
+    public void EnableDeflect()
+    {
+        DeflectOn = true;
+        DeflectAvailable = false;
+        this.gameObject.GetComponent<SpriteRenderer>().material = DeflectMaterial;
+        StartCoroutine(DeflectCooldown());
+        StartCoroutine(DeflectDuration());
+    }
+    public void Update()
+    {
+        if(ToggleDeflect.IsPressed() && DeflectOn == false && DeflectAvailable == true)
+        {
+            EnableDeflect();
+        }
+    }
 }

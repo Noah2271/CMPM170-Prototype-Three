@@ -28,11 +28,20 @@ public class BallBehaviour : MonoBehaviour
     public void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.CompareTag("Paddle")) {
-            Audio.PlayReflect();
-            PreservedVerticalVelocity = -PreservedVerticalVelocity;
-            this.gameObject.layer = LayerMask.NameToLayer("Kill Ball Layer");
-            this.gameObject.GetComponent<SpriteRenderer>().material = DeflectedMaterial;
-            BounceOffPaddle();
+            if ((other.gameObject == Paddle) && (Paddle.GetComponent<PaddleMovement>().DeflectOn == true)) 
+            {
+                Audio.PlayReflect();
+                PreservedVerticalVelocity = 2*-PreservedVerticalVelocity;
+                this.gameObject.layer = LayerMask.NameToLayer("Kill Ball Layer");
+                this.gameObject.GetComponent<SpriteRenderer>().material = DeflectedMaterial;
+                BounceOffPaddle();
+            }
+            if ((other.gameObject == Paddle) && (Paddle.GetComponent<PaddleMovement>().DeflectOn == false) && (this.gameObject.layer != LayerMask.NameToLayer("Kill Ball Layer")))
+            {
+                other.gameObject.SetActive(false);
+                Time.timeScale = 0;
+                Audio.PlayDie();
+            }
         }
         if (other.gameObject.CompareTag("BarrierRight") || other.gameObject.CompareTag("BarrierLeft")) BounceOffWall();
     }
