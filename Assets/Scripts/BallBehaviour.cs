@@ -20,19 +20,32 @@ public class BallBehaviour : MonoBehaviour
     }
 
     // Trigger and Collision Checks
-    // 1. Paddle Trigger : Play reflect sound, update preserved vertical velocity, enable the ball to kill the enemy, and switch the material. Finally call paddle bounce physics update function
+    // 1. Paddle Trigger : Checks if paddle in deflect mode, if so, return ball with 3x opposite force, add to layer that kills enemies, and change the material and activate trail renderer.
+    //    If not, timescale 0, disable paddle, play die sound, and display dead text. This check also checks if ball deflected by player so player cannot accidentally snipe themselves.
     // 2. Barrier Right/Left Trigger : Call bounce wall bounce physics update function
-    // 3. Breakable Collision : Play digital break sound, disable the breakable, and update preserved vertical velocity (Unity physics engine is handling bounces off barriers since they're more complex and I couldn't figure out the code)
+    // 3. Breakable Collision : Left over from Prototype 3.1
     // 4. Outer Boundary Collision : Big brick on the top outside the screen, just deletes balls that aren't in use.
-    // 5. GameOverObject Collision : The earth, plays d eath sound and updates screen to reflect end of game. Stops the game via timescale.
+    // 5. GameOverObject Collision : Left over from Prototype 3.1
     public void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.CompareTag("Paddle")) {
-            Audio.PlayReflect();
-            PreservedVerticalVelocity = -PreservedVerticalVelocity;
-            this.gameObject.layer = LayerMask.NameToLayer("Kill Ball Layer");
-            this.gameObject.GetComponent<SpriteRenderer>().material = DeflectedMaterial;
-            BounceOffPaddle();
+            if ((other.gameObject == Paddle) && (Paddle.GetComponent<PaddleMovement>().DeflectOn == true)) 
+            {
+                Audio.PlayReflect();
+                PreservedVerticalVelocity = 3*-PreservedVerticalVelocity;
+                this.gameObject.layer = LayerMask.NameToLayer("Kill Ball Layer");
+                this.gameObject.GetComponent<SpriteRenderer>().material = DeflectedMaterial;
+                this.gameObject.GetComponent<TrailRenderer>().enabled = true;
+                BounceOffPaddle(); 
+            }
+            if ((other.gameObject == Paddle) && (Paddle.GetComponent<PaddleMovement>().DeflectOn == false) && (this.gameObject.layer != LayerMask.NameToLayer("Kill Ball Layer")))
+            {
+                UI.EndScreenText.gameObject.SetActive(true);
+                UI.EndSCreenTextOverlay.gameObject.SetActive(true);
+                other.gameObject.SetActive(false);
+                Time.timeScale = 0;
+                Audio.PlayDie();
+            }
         }
         if (other.gameObject.CompareTag("BarrierRight") || other.gameObject.CompareTag("BarrierLeft")) BounceOffWall();
     }
@@ -52,7 +65,6 @@ public class BallBehaviour : MonoBehaviour
         if (collision.gameObject.CompareTag("GameOverObject"))
         {
             Audio.PlayDie();
-            UI.EndScreenText.gameObject.SetActive(true);
             collision.gameObject.SetActive(false);
             Time.timeScale = 0;
 
@@ -79,7 +91,7 @@ public class BallBehaviour : MonoBehaviour
     void BounceOffPaddle()
     {
         float differenceFromCenter = transform.position.x - Paddle.transform.position.x;
-        BallRigidBody.linearVelocity = new Vector2(differenceFromCenter * 5f, -BallRigidBody.linearVelocityY);
+        BallRigidBody.linearVelocityX = (differenceFromCenter * 10f);
     }
 
     // Update
