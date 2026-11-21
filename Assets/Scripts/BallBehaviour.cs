@@ -31,13 +31,16 @@ public class BallBehaviour : MonoBehaviour
             if ((other.gameObject == Paddle) && (Paddle.GetComponent<PaddleMovement>().DeflectOn == true)) 
             {
                 Audio.PlayReflect();
-                PreservedVerticalVelocity = 2*-PreservedVerticalVelocity;
+                PreservedVerticalVelocity = 3*-PreservedVerticalVelocity;
                 this.gameObject.layer = LayerMask.NameToLayer("Kill Ball Layer");
                 this.gameObject.GetComponent<SpriteRenderer>().material = DeflectedMaterial;
+                this.gameObject.GetComponent<TrailRenderer>().enabled = true;
                 BounceOffPaddle();
             }
             if ((other.gameObject == Paddle) && (Paddle.GetComponent<PaddleMovement>().DeflectOn == false) && (this.gameObject.layer != LayerMask.NameToLayer("Kill Ball Layer")))
             {
+                UI.EndScreenText.gameObject.SetActive(true);
+                UI.EndSCreenTextOverlay.gameObject.SetActive(true);
                 other.gameObject.SetActive(false);
                 Time.timeScale = 0;
                 Audio.PlayDie();
@@ -61,7 +64,6 @@ public class BallBehaviour : MonoBehaviour
         if (collision.gameObject.CompareTag("GameOverObject"))
         {
             Audio.PlayDie();
-            UI.EndScreenText.gameObject.SetActive(true);
             collision.gameObject.SetActive(false);
             Time.timeScale = 0;
 

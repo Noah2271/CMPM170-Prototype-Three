@@ -6,27 +6,35 @@ using JetBrains.Annotations;
 
 public class PaddleMovement : MonoBehaviour
 {
+    private UI_Manager UI;
     private GameObject Paddle;
     private GameObject BorderLeft;
     private GameObject BorderRight;
     public Material DefaultMaterial;
     public Material DeflectMaterial;
+    private bool Started = false;
+    public Material OffMaterial;
     public bool DeflectOn = false;
     public bool DeflectAvailable = false;
     private bool freezeRight = false;
     private bool freezeLeft = false;
+    public GameObject[] Indicators = new GameObject[5];
+    private int WorkingIndicatorIndex = 0;
     private InputAction Movement;
     private InputAction ToggleDeflect;
+    private InputAction StartKey;
     private float paddleWidth;
 
     void Start()
     {
+        Time.timeScale = 0;
         Paddle = GameObject.Find("Paddle");
+        UI = GameObject.Find("UI_Manager").GetComponent<UI_Manager>();
         BorderRight = GameObject.Find("BorderRight");
         BorderLeft = GameObject.Find("BorderLeft");
         Movement = InputSystem.actions.FindActionMap("Player").FindAction("Move");
         ToggleDeflect = InputSystem.actions.FindActionMap("Player").FindAction("ToggleDeflect");
-        StartCoroutine(DeflectCooldown());
+        StartKey = InputSystem.actions.FindActionMap("Player").FindAction("Start");
         Cursor.visible = false;
     }
 
@@ -78,16 +86,43 @@ public class PaddleMovement : MonoBehaviour
         }
     }
 
-    IEnumerator DeflectCooldown()
+    IEnumerator DeflectCooldown(float length)
     {
-        yield return new WaitForSeconds(10f);
+        yield return new WaitForSeconds(length);
+        UI.ChargeText.color = new Color(0f, 1f, 1f, 1f);
         DeflectAvailable = true;
     }
     IEnumerator DeflectDuration()
     {
         yield return new WaitForSeconds(5f);
         this.gameObject.GetComponent<SpriteRenderer>().material = DefaultMaterial;
+        StartCoroutine(DeflectCooldown(10));
+        StartCoroutine(IndicatorHandling("Charge"));
+        UI.ChargeText.color = new Color(0.537f, 0.537f, 0.537f, 1f);
         DeflectOn = false;
+    }
+
+    IEnumerator IndicatorHandling(string type)
+    {
+        if (type == "Use")
+        {
+            for (int i = Indicators.Length; i >= 0; i--)
+            {
+                if (i != Indicators.Length) Indicators[i].GetComponent<SpriteRenderer>().material = OffMaterial;
+
+                yield return new WaitForSeconds(1f);
+            }
+        }
+
+        else if (type == "Charge")
+        {
+            for (int i = -1; i < Indicators.Length; i++)
+            {
+                if ( i != -1 ) Indicators[i].GetComponent<SpriteRenderer>().material = DeflectMaterial;
+
+                yield return new WaitForSeconds(2f);
+            }
+        }
     }
 
     public void EnableDeflect()
@@ -95,14 +130,28 @@ public class PaddleMovement : MonoBehaviour
         DeflectOn = true;
         DeflectAvailable = false;
         this.gameObject.GetComponent<SpriteRenderer>().material = DeflectMaterial;
-        StartCoroutine(DeflectCooldown());
+        StartCoroutine(IndicatorHandling("Use"));
         StartCoroutine(DeflectDuration());
     }
+
+    public void StartGame()
+    {
+        Time.timeScale = 1;
+        Started = true;
+        UI.StartText.gameObject.SetActive(false);
+        StartCoroutine(DeflectCooldown(10));
+        StartCoroutine(IndicatorHandling("Charge"));
+    }
+
     public void Update()
     {
         if(ToggleDeflect.IsPressed() && DeflectOn == false && DeflectAvailable == true)
         {
             EnableDeflect();
+        }
+        if(!Started && StartKey.IsPressed())
+        {
+            StartGame();
         }
     }
 }
