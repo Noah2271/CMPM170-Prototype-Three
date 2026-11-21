@@ -1408,6 +1408,8 @@ MonoBehaviour:
   ballPrefab: {fileID: 7713502786661913582, guid: 8dab74534f95ac4429e1b5a610e7a1c5, type: 3}
   shootInterval: 1
   respawnTime: 5
+  part: 1
+  isDead: 0
   minShootAngle: 240
   maxShootAngle: 300
   bulletSpeed: 5
@@ -3820,8 +3822,8 @@ Transform:
   m_GameObject: {fileID: 1155400635}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.9510176, y: 4.08, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -2.05, y: 4.08, z: 0}
+  m_LocalScale: {x: 0.7, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -5093,6 +5095,8 @@ MonoBehaviour:
   ballPrefab: {fileID: 7713502786661913582, guid: 8dab74534f95ac4429e1b5a610e7a1c5, type: 3}
   shootInterval: 1
   respawnTime: 5
+  part: 2
+  isDead: 0
   minShootAngle: 240
   maxShootAngle: 300
   bulletSpeed: 5
@@ -5565,7 +5569,7 @@ Transform:
   m_GameObject: {fileID: 1914674105}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.9510176, y: 4.08, z: 0}
+  m_LocalPosition: {x: -2.05, y: 4.08, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -5609,11 +5613,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecdf42fcf28af5744a6c6907d338e997, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyRespawn
-  parts:
-  - {fileID: 1956353401}
-  - {fileID: 373281785}
-  - {fileID: 1673243631}
   respawnTime: 5
+  shootInterval: 1
   partsRemaining: 3
 --- !u!1 &1956353401
 GameObject:
@@ -5710,6 +5711,8 @@ MonoBehaviour:
   ballPrefab: {fileID: 7713502786661913582, guid: 8dab74534f95ac4429e1b5a610e7a1c5, type: 3}
   shootInterval: 1
   respawnTime: 5
+  part: 0
+  isDead: 0
   minShootAngle: 240
   maxShootAngle: 300
   bulletSpeed: 5
