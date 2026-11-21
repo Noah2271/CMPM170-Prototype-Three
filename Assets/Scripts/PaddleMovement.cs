@@ -86,12 +86,20 @@ public class PaddleMovement : MonoBehaviour
         }
     }
 
+    // Deflection Handling
+    // 1. DeflectCooldown is coroutine that reactivates the player ability to use deflect after X amount of time, right now it's 10. If adjusting, please only use multiples of 10.
+    // 2. DeflectDuration counts down how long the player stays in the deflect state, turns off deflect state after 5 seconds. If adjusting, please only use multiples of 5.
+    // 3. IndicatorHandling handles the visual indicator for the deflect state, the WaitForSeconds() values of both types will have to be manually adjusted if any of the above are adjusted.
+    // 4. EnableDeflect just turns on the deflect state and starts the tracking coroutines.
+    // 5. StartGame is used for the new start screen and also starts the initial coroutines.
+    // 6. Update is used for tracking player input for deflect and start.
     IEnumerator DeflectCooldown(float length)
     {
         yield return new WaitForSeconds(length);
         UI.ChargeText.color = new Color(0f, 1f, 1f, 1f);
         DeflectAvailable = true;
     }
+
     IEnumerator DeflectDuration()
     {
         yield return new WaitForSeconds(5f);
@@ -113,7 +121,6 @@ public class PaddleMovement : MonoBehaviour
                 yield return new WaitForSeconds(1f);
             }
         }
-
         else if (type == "Charge")
         {
             for (int i = -1; i < Indicators.Length; i++)
